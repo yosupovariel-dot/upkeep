@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /assets/img/certs/
+
+Sitemap: https://one-handasa.com/sitemap.xml
