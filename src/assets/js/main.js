@@ -52,20 +52,14 @@
   window.addEventListener('scroll', function () { if (!ticking) { ticking = true; window.requestAnimationFrame(onScroll); } }, { passive: true });
   onScroll();
 
-  /* ---------- active nav item ---------- */
-  var navLinks = $$('.nav a[href^="#"]');
-  if ('IntersectionObserver' in window && navLinks.length) {
-    var map = {};
-    navLinks.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
-    var navObs = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        if (en.isIntersecting && map[en.target.id]) {
-          navLinks.forEach(function (a) { a.removeAttribute('aria-current'); });
-          map[en.target.id].setAttribute('aria-current', 'true');
-        }
-      });
-    }, { rootMargin: '-45% 0px -50% 0px' });
-    Object.keys(map).forEach(function (id) { var s = document.getElementById(id); if (s) navObs.observe(s); });
+  /* ---------- current page in the nav strip (small screens) ---------- */
+  var curLink = $('.nav a[aria-current="page"]');
+  if (curLink) {
+    var strip = curLink.closest('.nav');
+    if (strip && strip.scrollWidth > strip.clientWidth + 2) {
+      var sr = strip.getBoundingClientRect(), cr = curLink.getBoundingClientRect();
+      strip.scrollLeft += (cr.left + cr.width / 2) - (sr.left + sr.width / 2);
+    }
   }
 
   /* ---------- mobile menu ---------- */
