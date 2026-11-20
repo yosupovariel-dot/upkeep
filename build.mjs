@@ -61,6 +61,19 @@ const SERVICES = [
     items: ['אישורי תחילת עבודות', 'הפקת טופס 4 ותעודת גמר', 'ליווי מול ועדות תכנון ובנייה', 'בדיקת תוכניות'] }
 ];
 
+const EXTRA = {
+  'new-apartment': { more: 'הבדיקה מתבצעת לפני המסירה או בתחילת תקופת הבדק, כך שהקבלן מחויב לתקן את הליקויים לפי חוק המכר (דירות). הדוח כולל תמונות, הפניה לתקן ואומדן עלות לכל ליקוי.', who: ['רוכשי דירה חדשה מקבלן', 'לפני מסירת מפתח', 'בתקופת הבדק והאחריות'] },
+  'second-hand': { more: 'הממצאים עוזרים להחליט אם להמשיך בעסקה, לנהל משא ומתן על המחיר או לבקש מהמוכר לתקן לפני החתימה.', who: ['רוכשי דירה או בית יד 2', 'לפני חתימה על חוזה', 'משקיעים בנדל"ן'] },
+  'common-property': { more: 'הדוח מסודר לפי אזורים ומערכות, ומאפשר לנציגות לנהל מול הקבלן או חברת הניהול דרישה מסודרת לתיקון.', who: ['נציגויות בתים', 'ועדי דיירים בבניין חדש', 'חברות ניהול'] },
+  'expert-opinion': { more: 'חוות הדעת מתאימה להגשה במסגרת תביעה או כבסיס למשא ומתן לפני הליך משפטי, והיא כתובה בשפה ברורה גם למי שאינו איש מקצוע.', who: ['דיירים מול קבלן או יזם', 'עורכי דין בתיקי ליקויי בנייה', 'קונים ומוכרים בסכסוך'] },
+  'court-expert': { more: 'הניסיון בביצוע, בפיקוח ובבדיקה מאפשר לבחון כל טענה לגופה, ולהציג לבית המשפט תמונה הנדסית מלאה ומבוססת.', who: ['בתי משפט', 'עורכי דין', 'צדדים בגישור או בבוררות'] },
+  'supervision': { more: 'הפיקוח כולל ביקורים קבועים באתר, דיווח מסודר ועבודה מול הקבלן והיועצים, כדי לתפוס בעיות כשעוד קל וזול לתקן אותן.', who: ['בונים בית פרטי', 'יזמים ומזמיני עבודה', 'גופים ציבוריים'] },
+  'structure': { more: 'האישור ניתן אחרי בדיקה בשטח ובחינה של האלמנט או המבנה, בהתאם לדרישות של הגורם המבקש.', who: ['בעלי נכסים ועסקים', 'קבלנים ומזמיני עבודה', 'לפי דרישת רשות או ביטוח'] },
+  'safety': { more: 'השירות מתאים לאתרי בנייה, לעבודות שיפוץ ולעסקים שנדרשים לעמוד בתקנות הבטיחות בעבודה.', who: ['קבלנים ואתרי בנייה', 'עסקים ומפעלים', 'עבודות בגובה'] },
+  'licensing': { more: 'היכרות עם הדרישות של הוועדות ועם שלבי התהליך חוסכת זמן, פניות חוזרות ועיכובים.', who: ['בעלי בתים שבונים או מרחיבים', 'יזמים וקבלנים', 'בעלי עסקים'] }
+};
+for (const s of SERVICES) Object.assign(s, EXTRA[s.id], { page: `service-${s.id}.html` });
+
 const QUALS = [
   ['קונסטרוקטור – הנדסה אזרחית', 'הנדסאי בניין רשום, מגמת תכנון קונסטרוקציה.'],
   ['מומחה בדק בית וכתיבת חוות דעת משפטית', 'הסמכות איגוד המהנדסים לבנייה ולתשתיות.'],
@@ -83,7 +96,7 @@ const CERTS = [
 /* ---------------- render helpers ---------------- */
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const arrow = '<svg aria-hidden="true"><use href="#i-arrow"/></svg>';
-const serviceCards = SERVICES.map((s) => `      <a class="svc reveal" href="services.html#${s.id}">
+const serviceCards = SERVICES.map((s) => `      <a class="svc reveal" href="${s.page}">
         <div class="svc__img"><img src="assets/img/photos/${s.img}.webp" width="900" height="600" alt="${esc(s.alt)}" loading="lazy"></div>
         <h3>${esc(s.title)}</h3>
         <p>${esc(s.short)}</p>
@@ -98,6 +111,76 @@ const serviceDetails = SERVICES.map((s) => `    <article class="svc-detail revea
         <div class="btn-row"><a class="btn btn--wa btn--sm js-wa" data-wa="${esc(s.title)}" href="https://wa.me/972509737244" target="_blank" rel="noopener noreferrer"><svg aria-hidden="true"><use href="#i-wa"/></svg>לפרטים בוואטסאפ</a></div>
       </div>
     </article>`).join('\n');
+const waBtn = (topic, label = 'לפרטים בוואטסאפ', cls = 'btn btn--wa js-wa') => `<a class="${cls}" data-wa="${esc(topic)}" href="https://wa.me/972509737244" target="_blank" rel="noopener noreferrer"><svg aria-hidden="true"><use href="#i-wa"/></svg>${label}</a>`;
+function servicePage(s) {
+  const idx = SERVICES.indexOf(s);
+  const rel = [SERVICES[(idx + 1) % 9], SERVICES[(idx + 2) % 9], SERVICES[(idx + 3) % 9]];
+  return `<!--page ${JSON.stringify({ title: s.title, desc: s.short + ' א.ח.ד הנדסת בניין ובטיחות – 050-9737244.', nav: 'services', path: s.page })}-->
+<section class="banner">
+  <div class="banner__bg" aria-hidden="true"><img src="assets/img/photos/${s.img}.webp" width="900" height="600" alt=""></div>
+  <div class="wrap">
+    <ol class="crumbs" aria-label="מיקום באתר"><li><a href="index.html">בית</a></li><li><a href="services.html">תחומי התמחות</a></li><li aria-current="page">${esc(s.title)}</li></ol>
+    <h1>${esc(s.title)}</h1>
+    <p>${esc(s.short)}</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap svc-page">
+    <article class="svc-page__main">
+      <img src="assets/img/photos/${s.img}.webp" width="900" height="600" alt="${esc(s.alt)}">
+      <h2>על השירות</h2>
+      <p>${esc(s.long)}</p>
+      <p>${esc(s.more)}</p>
+      <h2>מה כולל השירות</h2>
+      <ul class="checks checks--2">${s.items.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>
+      <h2>למי זה מתאים</h2>
+      <ul class="who">${s.who.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>
+      <div class="btn-row">${waBtn(s.title, 'שליחת הודעה בוואטסאפ')}<a class="btn btn--outline" href="tel:+972509737244"><svg aria-hidden="true"><use href="#i-phone"/></svg><span dir="ltr">050-9737244</span></a></div>
+    </article>
+    <aside class="side" aria-label="מידע נוסף">
+      <div class="side-card side-card--contact">
+        <h3>רוצים לתאם?</h3>
+        <p>שלחו הודעה עם סוג הנכס ומיקומו, ותקבלו הצעת מחיר נוחה ללא התחייבות.</p>
+        ${waBtn(s.title, 'וואטסאפ')}
+        <a class="btn btn--outline" href="tel:+972509737244"><svg aria-hidden="true"><use href="#i-phone"/></svg>חיוג</a>
+      </div>
+      <div class="side-card">
+        <h3>תחומי התמחות</h3>
+        <ul class="side-list">${SERVICES.map((o) => `<li><a href="${o.page}"${o.id === s.id ? ' aria-current="page"' : ''}>${esc(o.title)}${arrow}</a></li>`).join('')}</ul>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section class="section section--sand" aria-labelledby="how-title">
+  <div class="wrap">
+    <div class="heading"><h2 id="how-title">איך זה עובד?</h2></div>
+    <ol class="steps">
+      <li class="step reveal"><h3>שולחים הודעה</h3><p>בוואטסאפ או בטלפון, עם פרטי הנכס והצורך.</p></li>
+      <li class="step reveal"><h3>מתאמים</h3><p>מקבלים הצעת מחיר ברורה ומועד שנוח לכם.</p></li>
+      <li class="step reveal"><h3>בדיקה בשטח</h3><p>עבודה יסודית עם מכשור מתקדם.</p></li>
+      <li class="step reveal"><h3>דוח וליווי</h3><p>דוח מסודר וליווי עד הסוף.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="rel-title">
+  <div class="wrap">
+    <div class="heading heading--center"><h2 id="rel-title">שירותים נוספים</h2></div>
+    <div class="svc-grid">
+${rel.map((o) => `      <a class="svc reveal" href="${o.page}">
+        <div class="svc__img"><img src="assets/img/photos/${o.img}.webp" width="900" height="600" alt="${esc(o.alt)}" loading="lazy"></div>
+        <h3>${esc(o.title)}</h3>
+        <p>${esc(o.short)}</p>
+      </a>`).join('\n')}
+    </div>
+  </div>
+</section>
+
+{{cta}}
+`;
+}
 const quals = `    <ul class="quals">\n${QUALS.map(([t, d]) => `      <li class="qual reveal"><h3>${esc(t)}</h3><p>${esc(d)}</p></li>`).join('\n')}\n    </ul>`;
 const certItem = ([f, w, h, t, sub]) => `      <li class="cert reveal"><button class="cert__btn" type="button" data-full="assets/img/certs/${f}.webp" aria-label="הגדלת התעודה: ${esc(t)}"><img src="assets/img/certs/${f}.webp" width="${w}" height="${h}" alt="" loading="lazy" draggable="false"><span class="cert__zoom" aria-hidden="true"><svg><use href="#i-zoom"/></svg></span></button><b>${esc(t)}</b><span>${esc(sub)}</span></li>`;
 const certsAll = CERTS.map(certItem).join('\n');
@@ -173,9 +256,10 @@ const v = hash(css + js);
 const P = {};
 for (const n of ['header', 'footer', 'sprite', 'eye', 'cta']) P[n] = await readFile(`${SRC}/partials/${n}.html`, 'utf8');
 
-const pages = (await readdir(`${SRC}/pages`)).filter((f) => f.endsWith('.html'));
-for (const file of pages) {
-  const raw = await readFile(`${SRC}/pages/${file}`, 'utf8');
+const pages = [];
+for (const f of (await readdir(`${SRC}/pages`)).filter((f) => f.endsWith('.html'))) pages.push([f, await readFile(`${SRC}/pages/${f}`, 'utf8')]);
+for (const s of SERVICES) pages.push([s.page, servicePage(s)]);
+for (const [file, raw] of pages) {
   const m = raw.match(/^<!--page (\{.*?\})-->\n?/);
   if (!m) throw new Error(`missing page meta in ${file}`);
   const meta = JSON.parse(m[1]);
