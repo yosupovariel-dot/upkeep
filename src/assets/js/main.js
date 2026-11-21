@@ -46,6 +46,15 @@
     try { if (window.localStorage.getItem('ahd-fb') === '1') btn.click(); } catch (e) { /* ignore */ }
   });
 
+  /* pipe camera distance follows the 9s travel loop */
+  Array.prototype.forEach.call(document.querySelectorAll('.js-gear-dist'), function (el) {
+    var t0 = Date.now();
+    setInterval(function () {
+      if (doc.classList.contains('a11y-still')) return;
+      var p = ((Date.now() - t0) % 9000) / 9000;
+      el.textContent = (0.4 + p * 3.1).toFixed(1);
+    }, 120);
+  });
   /* equipment monitor: running recording timer */
   Array.prototype.forEach.call(document.querySelectorAll('.js-gear-time'), function (el) {
     var t0 = Date.now();

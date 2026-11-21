@@ -100,11 +100,21 @@
     </div>
     <div class="reveal">
       <div class="gear">
-        <div class="gear__stage" aria-hidden="true">
-          <div class="gear__device">
-            <img src="assets/img/inspection-camera.webp" width="800" height="1200" alt="" loading="lazy">
-            <div class="gear__screen"><span class="gear__scan"></span><span class="gear__rec">REC</span><span class="gear__time js-gear-time">00:00</span></div>
-          </div>
+        <div class="gear__stage">
+          <figure class="monitor" aria-label="הדמיה: מסך מצלמת צנרת בזמן בדיקה">
+            <div class="monitor__screen">
+              <img class="monitor__feed" src="assets/img/pipe-feed.webp" width="960" height="552" alt="צילום מתוך צנרת במצלמת בדיקה">
+              <div class="monitor__hud" aria-hidden="true">
+                <span class="hud hud--rec">REC</span>
+                <span class="hud hud--time js-gear-time">00:00</span>
+                <span class="hud hud--dist"><b class="js-gear-dist">0.0</b> m</span>
+                <span class="hud hud--cam">PIPE CAM · 1080p</span>
+                <span class="hud-cross"></span>
+                <span class="hud-corners"></span>
+              </div>
+            </div>
+            <figcaption class="monitor__cap"><span class="monitor__dot"></span>בדיקה חיה במצלמת צנרת</figcaption>
+          </figure>
         </div>
         <div class="gear__info">
           <h3>המכשור שלנו בבדיקה</h3>
