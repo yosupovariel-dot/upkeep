@@ -1,8 +1,8 @@
 {
   "_help": "הגדרות חיבור למדרג ולפייסבוק. ממלאים את הקישורים ומריצים npm run build. שדה ריק = הרכיב לא מוצג.",
-  "midragUrl": "",
+  "midragUrl": "https://www.midrag.co.il/SpCard/Sp/128273?areaId=26&serviceId=1335&sortByCategory=979&isGeneric=false",
   "midragRating": "",
   "midragReviewCount": "",
-  "facebookUrl": "",
+  "facebookUrl": "https://www.facebook.com/profile.php?id=61570329673002",
   "reviews": []
 }
