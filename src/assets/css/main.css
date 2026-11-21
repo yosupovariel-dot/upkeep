@@ -527,3 +527,26 @@ html.a11y-still *, html.a11y-still *::before, html.a11y-still *::after { animati
 .who { display: flex; flex-wrap: wrap; gap: .5rem; }
 .who li { background: var(--blush); color: var(--ink); border-radius: 6px; padding: .35rem .8rem; font-weight: 600; font-size: .95rem; }
 @media (max-width: 900px) { .svc-page { grid-template-columns: minmax(0, 1fr); } .side { position: static; } }
+
+/* ---------- reviews (real quotes from Midrag) ---------- */
+.quotes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin-top: 1.8rem; }
+.quote { background: #fff; border-radius: var(--radius); padding: 1.3rem; border: 1px solid var(--line); display: grid; gap: .7rem; align-content: start; margin: 0; }
+.quote .stars { margin: 0; }
+.quote .stars svg { width: 16px; height: 16px; }
+.quote blockquote { margin: 0; color: var(--ink); line-height: 1.65; }
+.quote figcaption { font-weight: 700; font-size: .92rem; color: var(--ink-3); }
+.quote figcaption span { font-weight: 500; }
+.rating-badge { display: inline-flex; align-items: baseline; gap: .4rem; font-family: var(--f-head); margin-bottom: .4rem; }
+.rating-badge strong { font-size: 2.2rem; font-weight: 900; color: var(--gold-ink); line-height: 1; }
+@media (max-width: 900px) { .quotes { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- Facebook ---------- */
+.fb-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(1.6rem, 4vw, 3rem); align-items: center; }
+.fb-embed { background: #fff; border-radius: var(--radius); border: 1px solid var(--line); min-height: 260px; display: grid; place-items: center; overflow: hidden; }
+.fb-embed__frame { width: 100%; display: grid; place-items: center; }
+.fb-embed__frame iframe { border: 0; max-width: 100%; display: block; }
+.fb-embed__placeholder { display: grid; gap: .8rem; justify-items: center; text-align: center; padding: 2rem 1.2rem; }
+.fb-embed__placeholder svg { width: 44px; height: 44px; color: #1877f2; }
+.fb-embed__placeholder small { color: var(--ink-3); max-width: 22rem; }
+.btn--fb { --b: #1877f2; }
+@media (max-width: 900px) { .fb-wrap { grid-template-columns: minmax(0, 1fr); } }

@@ -1,0 +1,8 @@
+{
+  "_help": "הגדרות חיבור למדרג ולפייסבוק. ממלאים את הקישורים ומריצים npm run build. שדה ריק = הרכיב לא מוצג.",
+  "midragUrl": "",
+  "midragRating": "",
+  "midragReviewCount": "",
+  "facebookUrl": "",
+  "reviews": []
+}

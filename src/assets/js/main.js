@@ -3,7 +3,6 @@
   'use strict';
 
   var PHONE_WA = '972509737244';
-  var MIDRAG_URL = 'https://www.google.com/search?q=%D7%90.%D7%97.%D7%93+%D7%93%D7%95%D7%93+%D7%97%D7%99+%D7%90%D7%91%D7%A8%D7%92%D7%9C+%D7%9E%D7%93%D7%A8%D7%92';
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var doc = document.documentElement;
   if (!doc.getAttribute('dir')) { doc.setAttribute('dir', 'rtl'); doc.setAttribute('lang', 'he'); }
@@ -26,7 +25,26 @@
       : 'שלום דוד, הגעתי מהאתר ואשמח לתאם בדק בית / לקבל הצעת מחיר.';
     a.href = 'https://wa.me/' + PHONE_WA + '?text=' + encodeURIComponent(msg);
   });
-  $$('.js-midrag').forEach(function (a) { a.href = MIDRAG_URL; });
+
+  /* ---------- Facebook page feed (official Page Plugin). Loads only after the visitor asks. ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll('.js-fb-load'), function (btn) {
+    btn.addEventListener('click', function () {
+      var box = btn.closest('.fb-embed');
+      var page = box.getAttribute('data-page');
+      var w = Math.min(500, Math.max(280, Math.floor(box.clientWidth)));
+      var f = document.createElement('iframe');
+      f.src = 'https://www.facebook.com/plugins/page.php?href=' + encodeURIComponent(page) + '&tabs=timeline&width=' + w + '&height=620&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false&locale=he_IL';
+      f.width = w; f.height = 620; f.title = 'הפוסטים האחרונים מעמוד הפייסבוק';
+      f.setAttribute('loading', 'lazy');
+      f.setAttribute('allow', 'encrypted-media');
+      f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+      var frame = box.querySelector('.fb-embed__frame');
+      while (frame.firstChild) frame.removeChild(frame.firstChild);
+      frame.appendChild(f);
+      try { window.localStorage.setItem('ahd-fb', '1'); } catch (e) { /* ignore */ }
+    });
+    try { if (window.localStorage.getItem('ahd-fb') === '1') btn.click(); } catch (e) { /* ignore */ }
+  });
 
   /* ---------- small live details ---------- */
   var y = new Date().getFullYear();

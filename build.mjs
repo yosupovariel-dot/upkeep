@@ -200,7 +200,7 @@ function head(m) {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${esc(title)}</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'; font-src 'self'; script-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'; font-src 'self'; script-src 'self'; connect-src 'self'; frame-src https://www.facebook.com; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="description" content="${esc(m.desc)}">
 ${m.noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" href="${SITE}${m.path}">`}
@@ -253,6 +253,49 @@ const js = JavaScriptObfuscator.obfuscate(jsMin, {
 await writeFile(`${OUT}/assets/js/main.js`, js);
 const v = hash(css + js);
 
+
+/* ---------------- Midrag + Facebook (from src/site-config.json) ---------------- */
+const CFG = JSON.parse(await readFile(`${SRC}/site-config.json`, 'utf8'));
+const MIDRAG_FALLBACK = 'https://www.google.com/search?q=' + encodeURIComponent("א.ח.ד דוד חי אברג'ל מדרג");
+const midragHref = CFG.midragUrl || MIDRAG_FALLBACK;
+const realReviews = (CFG.reviews || []).filter((r) => r && r.text && r.name);
+const star5 = '<svg><use href="#i-star"/></svg>'.repeat(5);
+const reviewsHtml = `<section class="section section--blush section--tight" aria-labelledby="reviews-title">
+  <div class="wrap">
+    <div class="reviews reveal">
+      <div>
+        ${CFG.midragRating ? `<div class="rating-badge"><strong>${esc(CFG.midragRating)}</strong><span>דירוג במדרג${CFG.midragReviewCount ? ` · ${esc(CFG.midragReviewCount)} חוות דעת` : ''}</span></div>` : `<div class="stars" aria-hidden="true">${star5}</div>`}
+        <h2 id="reviews-title">לקוחות ממליצים</h2>
+        <p>לקוחות רבים המליצו על א.ח.ד באתר מדרג, אחרי בדק בית וחוות דעת. כל ההמלצות שם מאומתות.</p>
+      </div>
+      <a class="btn" href="${esc(midragHref)}" target="_blank" rel="noopener noreferrer">לכל ההמלצות במדרג${arrow}</a>
+    </div>
+${realReviews.length ? `    <div class="quotes">
+${realReviews.slice(0, 6).map((r) => `      <figure class="quote reveal"><div class="stars" aria-hidden="true">${star5}</div><blockquote>${esc(r.text)}</blockquote><figcaption>${esc(r.name)}${r.service ? ` <span>· ${esc(r.service)}</span>` : ''}${r.date ? ` <span>· ${esc(r.date)}</span>` : ''}</figcaption></figure>`).join('\n')}
+    </div>
+    <p class="certs-note">ההמלצות מתוך <a href="${esc(midragHref)}" target="_blank" rel="noopener noreferrer">הפרופיל של א.ח.ד במדרג</a>.</p>` : ''}
+  </div>
+</section>`;
+const fb = CFG.facebookUrl;
+const facebookHtml = fb ? `<section class="section" aria-labelledby="fb-title">
+  <div class="wrap fb-wrap">
+    <div class="split__copy reveal">
+      <div class="heading"><h2 id="fb-title">מהשטח, בפייסבוק</h2><p>בדיקות, ממצאים וטיפים מקצועיים שאנחנו משתפים בעמוד הפייסבוק.</p></div>
+      <div class="btn-row"><a class="btn btn--fb" href="${esc(fb)}" target="_blank" rel="noopener noreferrer"><svg aria-hidden="true"><use href="#i-fb"/></svg>לעמוד הפייסבוק</a></div>
+    </div>
+    <div class="fb-embed reveal" data-page="${esc(fb)}">
+      <div class="fb-embed__frame">
+        <div class="fb-embed__placeholder">
+          <svg aria-hidden="true"><use href="#i-fb"/></svg>
+          <button class="btn btn--fb js-fb-load" type="button">הצגת הפוסטים האחרונים</button>
+          <small>לחיצה תטען תוכן מפייסבוק (Meta), בהתאם ל<a href="privacy.html">מדיניות הפרטיות</a>.</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>` : '';
+const fbTop = fb ? `      <a href="${esc(fb)}" target="_blank" rel="noopener noreferrer"><svg aria-hidden="true"><use href="#i-fb"/></svg>פייסבוק</a>` : '';
+const fbFooter = fb ? `          <li><a href="${esc(fb)}" target="_blank" rel="noopener noreferrer"><svg aria-hidden="true"><use href="#i-fb"/></svg>עמוד הפייסבוק</a></li>` : '';
 const P = {};
 for (const n of ['header', 'footer', 'sprite', 'eye', 'cta']) P[n] = await readFile(`${SRC}/partials/${n}.html`, 'utf8');
 
@@ -264,10 +307,10 @@ for (const [file, raw] of pages) {
   if (!m) throw new Error(`missing page meta in ${file}`);
   const meta = JSON.parse(m[1]);
   let body = raw.slice(m[0].length);
-  const vars = { eye: P.eye, cta: P.cta, serviceCards, serviceIndex, serviceDetails, quals, certsAll, certsTeaser };
+  const vars = { eye: P.eye, cta: P.cta, serviceCards, serviceIndex, serviceDetails, quals, certsAll, certsTeaser, reviews: reviewsHtml, facebook: facebookHtml };
   body = body.replace(/\{\{(\w+)\}\}/g, (_, k) => { if (!(k in vars)) throw new Error(`unknown var ${k} in ${file}`); return vars[k]; });
-  const header = P.header.replace('{{sprite}}', P.sprite).replace('{{navItems}}', navItems(meta.nav)).replace('{{menuItems}}', menuItems(meta.nav));
-  const footer = P.footer.replace('{{footerNav}}', footerNav);
+  const header = P.header.replace('{{sprite}}', P.sprite).replace('{{navItems}}', navItems(meta.nav)).replace('{{menuItems}}', menuItems(meta.nav)).replace('{{fbTop}}', fbTop);
+  const footer = P.footer.replace('{{footerNav}}', footerNav).replace('{{fbFooter}}', fbFooter);
   let html = `${head(meta)}\n${header}\n<main id="main" tabindex="-1">\n${body}\n</main>\n${footer}\n</body>\n</html>\n`;
   if (/\{\{\w+\}\}/.test(html)) throw new Error(`unresolved placeholder in ${file}`);
   html = html.replace('assets/css/main.css', `assets/css/main.css?v=${v}`).replace('assets/js/main.js', `assets/js/main.js?v=${v}`);
