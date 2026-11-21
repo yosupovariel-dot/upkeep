@@ -276,22 +276,42 @@
       var w = wins[Math.floor(Math.random() * wins.length)]; if (w) w.classList.toggle('on');
     }, 650);
   }
+  /* bubble level: a small physics gimmick – the bubble sways and settles back to centre */
   var level = $('.js-level');
   if (level) {
     var bubble = $('.level__bubble', level);
-    var levelText = $('.js-level-text');
-    var setTilt = function (t) {
-      t = Math.max(-1, Math.min(1, t));
-      var max = (level.clientWidth / 2) - 26;
-      bubble.style.setProperty('--tilt', (t * max).toFixed(1) + 'px');
-      if (levelText) levelText.textContent = Math.abs(t) < 0.08 ? 'מאוזן. בדיוק כמו שצריך.' : 'הזיזו את העכבר או הטו את הטלפון. אנחנו בודקים שהכל מאוזן.';
+    var x = 0, v = 0, target = 0, lastY = window.scrollY, running = false, seen = false;
+    var still = function () { return reduceMotion || doc.classList.contains('a11y-still'); };
+    var maxX = function () { return Math.max(10, level.clientWidth / 2 - 24); };
+    var step = function () {
+      // spring towards the target, which itself relaxes back to 0 (level)
+      target *= 0.94;
+      v += (target - x) * 0.08;
+      v *= 0.86;
+      x += v;
+      var m = maxX();
+      if (x > m) { x = m; v *= -0.4; } else if (x < -m) { x = -m; v *= -0.4; }
+      bubble.style.setProperty('--tilt', x.toFixed(2) + 'px');
+      if (Math.abs(v) > 0.02 || Math.abs(x) > 0.05 || Math.abs(target) > 0.05) window.requestAnimationFrame(step);
+      else { running = false; bubble.style.setProperty('--tilt', '0px'); }
     };
-    window.addEventListener('pointermove', function (e) {
-      var r = level.getBoundingClientRect();
-      if (r.top > window.innerHeight || r.bottom < 0) return;
-      setTilt(((e.clientX / window.innerWidth) - 0.5) * 2.2);
+    var kick = function (dx) {
+      if (still()) return;
+      target = Math.max(-maxX(), Math.min(maxX(), target + dx));
+      if (!running) { running = true; window.requestAnimationFrame(step); }
+    };
+    var inView = function () { var r = level.getBoundingClientRect(); return r.top < window.innerHeight && r.bottom > 0; };
+    window.addEventListener('scroll', function () {
+      var y = window.scrollY, dy = y - lastY; lastY = y;
+      if (!inView()) return;
+      if (!seen) { seen = true; kick(maxX() * 0.9); return; }
+      kick(Math.max(-14, Math.min(14, dy * 0.35)));
     }, { passive: true });
-    window.addEventListener('deviceorientation', function (e) { if (e.gamma !== null) setTilt(e.gamma / 30); }, { passive: true });
+    level.parentNode.addEventListener('pointermove', function (e) {
+      var r = level.getBoundingClientRect();
+      kick(((e.clientX - (r.left + r.width / 2)) / r.width) * 6);
+    });
+    level.parentNode.addEventListener('pointerdown', function () { kick((Math.random() > 0.5 ? 1 : -1) * maxX() * 0.8); });
   }
 
   /* ---------- accessibility widget ---------- */
