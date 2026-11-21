@@ -18,7 +18,8 @@ const NAV = [
   ['why', 'about.html#why', 'למה לבחור בנו'],
   ['services', 'services.html', 'תחומי התמחות'],
   ['inspection', 'home-inspection.html', 'בדק בית'],
-  ['certs', 'certificates.html', 'הסמכות ותעודות'],
+  ['certs', 'certificates.html', 'הסמכות'],
+  ['clients', 'testimonials.html', 'לקוחות מרוצים'],
   ['contact', 'contact.html', 'צור קשר']
 ];
 
@@ -267,12 +268,39 @@ const reviewsHtml = `<section class="section reviews-lux" aria-labelledby="revie
         <p>לקוחות רבים המליצו על א.ח.ד באתר מדרג, אחרי בדק בית וחוות דעת.</p>
         <p class="verified"><svg aria-hidden="true"><use href="#i-check"/></svg>חוות דעת מאומתות של לקוחות אמיתיים באתר מדרג</p>
       </div>
-      <a class="btn btn--light" href="${esc(midragHref)}" target="_blank" rel="noopener noreferrer">לכל ההמלצות במדרג${arrow}</a>
+      <div class="btn-row"><a class="btn btn--light" href="testimonials.html">לקוחות מרוצים${arrow}</a><a class="btn btn--outline-light" href="${esc(midragHref)}" target="_blank" rel="noopener noreferrer">לפרופיל במדרג</a></div>
     </div>
 ${realReviews.length ? `    <div class="quotes">
 ${realReviews.slice(0, 6).map((r) => `      <figure class="quote reveal"><div class="stars" aria-hidden="true">${star5}</div><blockquote>${esc(r.text)}</blockquote><figcaption>${esc(r.name)}${r.service ? ` <span>· ${esc(r.service)}</span>` : ''}${r.date ? ` <span>· ${esc(r.date)}</span>` : ''}</figcaption></figure>`).join('\n')}
     </div>
     <p class="certs-note">ההמלצות מתוך <a href="${esc(midragHref)}" target="_blank" rel="noopener noreferrer">הפרופיל של א.ח.ד במדרג</a>.</p>` : ''}
+  </div>
+</section>`;
+
+const quoteCard = (r) => `      <figure class="quote reveal"><div class="stars" aria-hidden="true">${star5}</div><blockquote>${esc(r.text)}</blockquote><figcaption>${esc(r.name)}${r.service ? ` <span>· ${esc(r.service)}</span>` : ''}${r.date ? ` <span>· ${esc(r.date)}</span>` : ''}</figcaption></figure>`;
+const clientsSummary = `<section class="section reviews-lux" aria-labelledby="clients-sum">
+  <div class="wrap clients-sum reveal">
+    <div>
+      ${CFG.midragRating ? `<div class="rating-badge"><strong>${esc(CFG.midragRating)}</strong><span>דירוג במדרג${CFG.midragReviewCount ? ` · ${esc(CFG.midragReviewCount)} חוות דעת` : ''}</span></div>` : `<div class="stars" aria-hidden="true">${star5}</div>`}
+      <h2 id="clients-sum">ההמלצות מאומתות באתר מדרג</h2>
+      <p>במדרג אפשר לכתוב חוות דעת רק אחרי שירות אמיתי, וכל חוות דעת נבדקת. לכן אנחנו מפנים אליו בגאווה.</p>
+      <p class="verified"><svg aria-hidden="true"><use href="#i-check"/></svg>חוות דעת של לקוחות אמיתיים בלבד</p>
+    </div>
+    <a class="btn btn--light" href="${esc(midragHref)}" target="_blank" rel="noopener noreferrer">לפרופיל המלא במדרג${arrow}</a>
+  </div>
+</section>`;
+const clientsWall = realReviews.length ? `<section class="section" aria-labelledby="wall-title">
+  <div class="wrap">
+    <div class="heading heading--center reveal"><h2 id="wall-title">מה הלקוחות כותבים</h2><p>חוות דעת שנכתבו על א.ח.ד באתר מדרג.</p></div>
+    <div class="quote-wall">
+${realReviews.map(quoteCard).join('\n')}
+    </div>
+    <p class="certs-note">כל ההמלצות מתוך <a href="${esc(midragHref)}" target="_blank" rel="noopener noreferrer">הפרופיל של א.ח.ד במדרג</a>.</p>
+  </div>
+</section>` : `<section class="section" aria-labelledby="wall-title">
+  <div class="wrap clients-empty reveal">
+    <div class="heading heading--center"><h2 id="wall-title">מה הלקוחות כותבים</h2><p>את כל חוות הדעת של הלקוחות שלנו אפשר לקרוא בפרופיל של א.ח.ד באתר מדרג.</p></div>
+    <a class="btn" href="${esc(midragHref)}" target="_blank" rel="noopener noreferrer">לקריאת חוות הדעת במדרג${arrow}</a>
   </div>
 </section>`;
 const fb = CFG.facebookUrl;
@@ -315,7 +343,7 @@ for (const [file, raw] of pages) {
   if (!m) throw new Error(`missing page meta in ${file}`);
   const meta = JSON.parse(m[1]);
   let body = raw.slice(m[0].length);
-  const vars = { eye: P.eye, cta: P.cta, planner: P.planner, serviceCards, serviceIndex, serviceDetails, quals, certsAll, certsTeaser, reviews: reviewsHtml, facebook: facebookHtml };
+  const vars = { eye: P.eye, cta: P.cta, planner: P.planner, serviceCards, serviceIndex, serviceDetails, quals, certsAll, certsTeaser, reviews: reviewsHtml, facebook: facebookHtml, clientsSummary, clientsWall, midragHref: esc(midragHref) };
   body = body.replace(/\{\{(\w+)\}\}/g, (_, k) => { if (!(k in vars)) throw new Error(`unknown var ${k} in ${file}`); return vars[k]; });
   const header = P.header.replace('{{sprite}}', P.sprite).replace('{{navItems}}', navItems(meta.nav)).replace('{{menuItems}}', menuItems(meta.nav)).replace('{{fbTop}}', fbTop);
   const footer = P.footer.replace('{{footerNav}}', footerNav).replace('{{fbFooter}}', fbFooter);
