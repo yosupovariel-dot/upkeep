@@ -550,3 +550,25 @@ html.a11y-still *, html.a11y-still *::before, html.a11y-still *::after { animati
 .fb-embed__placeholder small { color: var(--ink-3); max-width: 22rem; }
 .btn--fb { --b: #1877f2; }
 @media (max-width: 900px) { .fb-wrap { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- luxury treatment: reviews + facebook ---------- */
+.reviews-lux { position: relative; isolation: isolate; overflow: hidden; color: #fff; background: radial-gradient(120% 140% at 100% 0%, #2b4a6e 0%, #1b2b40 55%, #142133 100%); }
+.reviews-lux::before { content: "״"; position: absolute; left: 4%; top: -.18em; z-index: -1; font-family: var(--f-head); font-weight: 900; font-size: clamp(12rem, 26vw, 22rem); line-height: 1; color: rgba(188,216,241,.08); }
+.reviews-lux::after { content: ""; position: absolute; inset: auto 0 0 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(188,216,241,.5), transparent); }
+.reviews-lux h2 { color: #fff; font-size: var(--step-4); font-weight: 900; }
+.reviews-lux .reviews p { color: rgba(255,255,255,.8); }
+.reviews-lux .stars { color: #e3c77c; }
+.reviews-lux .stars svg { width: 24px; height: 24px; }
+.reviews-lux .rating-badge strong { color: #fff; font-size: 3rem; }
+.reviews-lux .rating-badge span { color: rgba(255,255,255,.75); }
+.verified { display: inline-flex; align-items: center; gap: .45rem; font-size: .95rem !important; color: #bcd8f1 !important; margin-top: .8rem !important; }
+.verified svg { width: 18px; height: 18px; padding: 2px; border-radius: 50%; background: rgba(188,216,241,.18); }
+.reviews-lux .quotes { margin-top: 2.4rem; }
+.reviews-lux .quote { position: relative; background: rgba(255,255,255,.05); border: 1px solid rgba(188,216,241,.22); padding: 1.6rem 1.4rem 1.3rem; backdrop-filter: blur(6px); transition: transform .4s, border-color .4s; }
+.reviews-lux .quote:hover { transform: translateY(-4px); border-color: rgba(188,216,241,.5); }
+.reviews-lux .quote::before { content: "״"; position: absolute; top: -.25em; left: 1rem; font-family: var(--f-head); font-weight: 900; font-size: 4rem; color: #bcd8f1; line-height: 1; }
+.reviews-lux .quote blockquote { color: #fff; font-size: 1.05rem; }
+.reviews-lux .quote figcaption { color: rgba(255,255,255,.7); border-top: 1px solid rgba(188,216,241,.18); padding-top: .7rem; }
+.reviews-lux .certs-note, .reviews-lux .certs-note a { color: rgba(255,255,255,.7); }
+.fb-lux { background: linear-gradient(180deg, var(--sand), #fff); }
+.fb-lux .fb-embed { border: 0; box-shadow: 0 30px 60px -30px rgba(28,43,61,.45), 0 0 0 1px var(--line); border-radius: 18px; padding: .6rem; }

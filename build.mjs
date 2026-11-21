@@ -260,15 +260,16 @@ const MIDRAG_FALLBACK = 'https://www.google.com/search?q=' + encodeURIComponent(
 const midragHref = CFG.midragUrl || MIDRAG_FALLBACK;
 const realReviews = (CFG.reviews || []).filter((r) => r && r.text && r.name);
 const star5 = '<svg><use href="#i-star"/></svg>'.repeat(5);
-const reviewsHtml = `<section class="section section--blush section--tight" aria-labelledby="reviews-title">
+const reviewsHtml = `<section class="section reviews-lux" aria-labelledby="reviews-title">
   <div class="wrap">
     <div class="reviews reveal">
       <div>
         ${CFG.midragRating ? `<div class="rating-badge"><strong>${esc(CFG.midragRating)}</strong><span>דירוג במדרג${CFG.midragReviewCount ? ` · ${esc(CFG.midragReviewCount)} חוות דעת` : ''}</span></div>` : `<div class="stars" aria-hidden="true">${star5}</div>`}
         <h2 id="reviews-title">לקוחות ממליצים</h2>
-        <p>לקוחות רבים המליצו על א.ח.ד באתר מדרג, אחרי בדק בית וחוות דעת. כל ההמלצות שם מאומתות.</p>
+        <p>לקוחות רבים המליצו על א.ח.ד באתר מדרג, אחרי בדק בית וחוות דעת.</p>
+        <p class="verified"><svg aria-hidden="true"><use href="#i-check"/></svg>חוות דעת מאומתות של לקוחות אמיתיים באתר מדרג</p>
       </div>
-      <a class="btn" href="${esc(midragHref)}" target="_blank" rel="noopener noreferrer">לכל ההמלצות במדרג${arrow}</a>
+      <a class="btn btn--light" href="${esc(midragHref)}" target="_blank" rel="noopener noreferrer">לכל ההמלצות במדרג${arrow}</a>
     </div>
 ${realReviews.length ? `    <div class="quotes">
 ${realReviews.slice(0, 6).map((r) => `      <figure class="quote reveal"><div class="stars" aria-hidden="true">${star5}</div><blockquote>${esc(r.text)}</blockquote><figcaption>${esc(r.name)}${r.service ? ` <span>· ${esc(r.service)}</span>` : ''}${r.date ? ` <span>· ${esc(r.date)}</span>` : ''}</figcaption></figure>`).join('\n')}
@@ -277,7 +278,7 @@ ${realReviews.slice(0, 6).map((r) => `      <figure class="quote reveal"><div cl
   </div>
 </section>`;
 const fb = CFG.facebookUrl;
-const facebookHtml = fb ? `<section class="section" aria-labelledby="fb-title">
+const facebookHtml = fb ? `<section class="section fb-lux" aria-labelledby="fb-title">
   <div class="wrap fb-wrap">
     <div class="split__copy reveal">
       <div class="heading"><h2 id="fb-title">מהשטח, בפייסבוק</h2><p>בדיקות, ממצאים וטיפים מקצועיים שאנחנו משתפים בעמוד הפייסבוק.</p></div>
