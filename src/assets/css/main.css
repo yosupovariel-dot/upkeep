@@ -25,7 +25,7 @@
   --line: #dbe6f0;
   --night: #1b2b40;
   --night-2: #253a54;
-  --wa: #138a4a;
+  --wa: #2c6aa3;
   --white: #ffffff;
 
   --f-head: "Heebo", "Rubik", "Segoe UI", Arial, sans-serif;
@@ -79,7 +79,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .btn:hover { transform: translateY(-1px); }
 .btn svg { width: 21px; height: 21px; flex: none; }
 .btn--wa { --b: var(--wa); }
-.btn--wa:hover { --b: #106a37; }
+.btn--wa:hover { --b: #1f5283; }
 .btn--outline { --f: var(--ink); background: transparent; }
 .btn--outline:hover { background: var(--ink); color: #fff; }
 .btn--light { --b: #fff; --f: var(--ink); }
@@ -439,7 +439,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .action-bar.is-visible { transform: none; }
 .action-bar .btn { width: 100%; min-height: 48px; }
 @media (max-width: 860px) { .action-bar { display: grid; } .footer { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 96px); } }
-.wa-float { position: fixed; z-index: 105; bottom: calc(env(safe-area-inset-bottom, 0px) + 24px); right: max(24px, env(safe-area-inset-right, 0px)); width: 58px; height: 58px; border-radius: 50%; background: var(--wa); color: #fff; display: grid; place-items: center; box-shadow: 0 10px 26px -8px rgba(21,127,67,.6); text-decoration: none; transition: transform .25s; }
+.wa-float { position: fixed; z-index: 105; bottom: calc(env(safe-area-inset-bottom, 0px) + 24px); right: max(24px, env(safe-area-inset-right, 0px)); width: 58px; height: 58px; border-radius: 50%; background: var(--wa); color: #fff; display: grid; place-items: center; box-shadow: 0 10px 26px -8px rgba(44,106,163,.55); text-decoration: none; transition: transform .25s; }
 .wa-float:hover { transform: scale(1.06); }
 .wa-float svg { width: 30px; height: 30px; }
 @media (max-width: 860px) { .wa-float { display: none; } }
