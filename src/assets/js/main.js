@@ -138,82 +138,193 @@
     });
   }
 
-  /* ---------- inspector's eye: thermal lens ---------- */
-  var stage = $('#eye-stage');
-  if (stage) {
-    var items = $$('.eye__item');
-    var temp = $('.js-temp');
-    var hint = $('.eye__hint', stage);
-    var pos = { x: 21, y: 23 };
-    var target = { x: 21, y: 23 };
-    var userMoved = false;
-    var idleT = null;
-    var autoIdx = 0;
-    function radius() { return Math.max(56, Math.min(120, stage.clientWidth * 0.11)); }
+  /* ---------- inspector's eye: thermal lens with discovery ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll('.eye__stage'), function (stage) {
+    var root = stage.closest('.eye__layout');
+    var items = Array.prototype.slice.call(root.querySelectorAll('.eye__item'));
+    var pins = Array.prototype.slice.call(stage.querySelectorAll('.eye__pin'));
+    var temp = stage.querySelector('.js-temp');
+    var hint = stage.querySelector('.eye__hint');
+    var callout = stage.querySelector('.eye__callout');
+    var cTitle = stage.querySelector('.js-callout-title');
+    var cTemp = stage.querySelector('.js-callout-temp');
+    var foundEl = root.querySelector('.js-found');
+    var meter = root.querySelector('.js-meter');
+    var done = root.querySelector('.eye__done');
+    var modeBtn = root.querySelector('.js-eye-mode');
+    var spots = items.map(function (b) { return { x: parseFloat(b.dataset.x), y: parseFloat(b.dataset.y), t: parseFloat(b.dataset.t), name: b.querySelector('b').textContent }; });
+    var found = spots.map(function () { return false; });
+    var pos = { x: 50, y: 45 }, target = { x: 50, y: 45 };
+    var animating = false, interacted = false, tourT = null, tourI = -1, hover = -1;
+
+    pins.forEach(function (p, i) { p.style.setProperty('--px', spots[i].x + '%'); p.style.setProperty('--py', spots[i].y + '%'); });
+    function radius() { return Math.max(52, Math.min(118, stage.clientWidth * 0.12)); }
     function apply() {
       stage.style.setProperty('--x', pos.x + '%');
       stage.style.setProperty('--y', pos.y + '%');
       stage.style.setProperty('--r', radius() + 'px');
     }
-    function nearestTemp(x, yv) {
-      var best = null, bd = 1e9;
-      items.forEach(function (b) {
-        var dx = x - parseFloat(b.dataset.x), dy = yv - parseFloat(b.dataset.y);
-        var d = dx * dx + dy * dy;
-        if (d < bd) { bd = d; best = b; }
+    function nearest(x, y) {
+      // distance in screen-proportional units so it feels the same on any aspect ratio
+      var w = stage.clientWidth || 1, h = stage.clientHeight || 1, best = -1, bd = 1e9;
+      spots.forEach(function (s, i) {
+        var dx = (x - s.x) / 100 * w, dy = (y - s.y) / 100 * h, d = Math.sqrt(dx * dx + dy * dy);
+        if (d < bd) { bd = d; best = i; }
       });
-      var base = 21.5;
-      if (best && bd < 120) return parseFloat(best.dataset.t);
-      return base + Math.sin(x * 0.3) * 0.8 + Math.cos(yv * 0.2) * 0.6;
+      return { i: best, d: bd };
     }
-    function select(btn, move) {
-      items.forEach(function (b) { b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'); });
-      if (move) { target.x = parseFloat(btn.dataset.x); target.y = parseFloat(btn.dataset.y); }
+    function select(i) { items.forEach(function (b, k) { b.setAttribute('aria-pressed', k === i ? 'true' : 'false'); }); }
+    function markFound(i) {
+      if (found[i]) return;
+      found[i] = true;
+      pins[i].classList.add('is-found');
+      items[i].classList.add('is-found');
+      var n = found.filter(Boolean).length;
+      foundEl.textContent = n;
+      meter.style.setProperty('--p', (n / spots.length * 100) + '%');
+      if (n === spots.length) done.hidden = false;
     }
-    function animate() {
-      pos.x += (target.x - pos.x) * 0.18;
-      pos.y += (target.y - pos.y) * 0.18;
-      apply();
-      if (temp) temp.textContent = nearestTemp(pos.x, pos.y).toFixed(1) + '°C';
-      if (Math.abs(target.x - pos.x) > 0.05 || Math.abs(target.y - pos.y) > 0.05) window.requestAnimationFrame(animate);
+    function update() {
+      var near = nearest(pos.x, pos.y);
+      var r = radius();
+      var t = near.d < r * 0.55 ? spots[near.i].t : 21.4 + Math.sin(pos.x * 0.21) * 0.6 + Math.cos(pos.y * 0.17) * 0.4;
+      temp.textContent = t.toFixed(1) + '°C';
+      if (near.d < r * 0.55) {
+        if (hover !== near.i) { hover = near.i; select(near.i); }
+        markFound(near.i);
+        cTitle.textContent = spots[near.i].name;
+        cTemp.textContent = spots[near.i].t.toFixed(1) + '°C';
+        callout.hidden = false;
+        callout.classList.toggle('is-left', pos.x > 58);
+        callout.classList.toggle('is-low', pos.y < 30);
+      } else { hover = -1; callout.hidden = true; }
+    }
+    function frame() {
+      pos.x += (target.x - pos.x) * 0.2;
+      pos.y += (target.y - pos.y) * 0.2;
+      apply(); update();
+      if (Math.abs(target.x - pos.x) > 0.04 || Math.abs(target.y - pos.y) > 0.04) window.requestAnimationFrame(frame);
       else animating = false;
     }
-    var animating = false;
-    function kick() { if (!animating) { animating = true; window.requestAnimationFrame(animate); } }
+    function go(x, y) {
+      target.x = Math.max(2, Math.min(98, x)); target.y = Math.max(3, Math.min(97, y));
+      if (!animating) { animating = true; window.requestAnimationFrame(frame); }
+    }
     function fromEvent(e) {
       var r = stage.getBoundingClientRect();
-      var cx = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
-      var cy = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
-      target.x = Math.max(0, Math.min(100, cx / r.width * 100));
-      target.y = Math.max(0, Math.min(100, cy / r.height * 100));
-      if (!userMoved) { userMoved = true; if (hint) hint.hidden = true; }
-      // auto-select the nearest finding when the lens passes over it
-      items.forEach(function (b) {
-        var dx = target.x - parseFloat(b.dataset.x), dy = target.y - parseFloat(b.dataset.y);
-        if (dx * dx + dy * dy < 40) select(b, false);
-      });
-      kick();
-      clearTimeout(idleT);
-      idleT = setTimeout(autoTour, 9000);
+      return { x: (e.clientX - r.left) / r.width * 100, y: (e.clientY - r.top) / r.height * 100 };
     }
-    stage.addEventListener('pointermove', fromEvent);
-    stage.addEventListener('pointerdown', function (e) { if (stage.setPointerCapture) { try { stage.setPointerCapture(e.pointerId); } catch (er) { /* noop */ } } fromEvent(e); });
-    items.forEach(function (b) {
-      b.addEventListener('click', function () { userMoved = true; if (hint) hint.hidden = true; select(b, true); kick(); clearTimeout(idleT); idleT = setTimeout(autoTour, 12000); });
+    function userMoved() {
+      interacted = true; if (hint) hint.hidden = true;
+      clearTimeout(tourT); tourT = setTimeout(tour, 9000);
+    }
+    var dragging = false;
+    stage.addEventListener('pointermove', function (e) {
+      if (e.pointerType === 'mouse' || dragging) { var p = fromEvent(e); go(p.x, p.y); userMoved(); }
     });
-    function autoTour() {
-      if (reduceMotion || doc.classList.contains('a11y-still')) return;
+    stage.addEventListener('pointerdown', function (e) { dragging = true; var p = fromEvent(e); go(p.x, p.y); userMoved(); });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (ev) { stage.addEventListener(ev, function () { dragging = false; }); });
+    items.forEach(function (b, i) {
+      b.addEventListener('click', function () { select(i); go(spots[i].x, spots[i].y); userMoved(); markFound(i); });
+    });
+    modeBtn.addEventListener('click', function () {
+      var on = !stage.classList.contains('is-full');
+      stage.classList.toggle('is-full', on);
+      modeBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      modeBtn.textContent = on ? 'חזרה לעדשה' : 'מצב תרמי מלא';
+      if (on) spots.forEach(function (s, i) { markFound(i); });
+      callout.hidden = true;
+    });
+    function tour() {
+      if (reduceMotion || doc.classList.contains('a11y-still') || stage.classList.contains('is-full')) return;
       var r = stage.getBoundingClientRect();
       if (r.bottom > 0 && r.top < window.innerHeight) {
-        autoIdx = (autoIdx + 1) % items.length;
-        select(items[autoIdx], true); kick();
+        tourI = (tourI + 1) % spots.length;
+        select(tourI); go(spots[tourI].x, spots[tourI].y);
       }
-      idleT = setTimeout(autoTour, 4200);
+      tourT = setTimeout(tour, 3800);
     }
+    // the idle tour must not count discoveries: guard markFound until the visitor interacts
+    var realMark = markFound;
+    markFound = function (i) { if (interacted) realMark(i); };
     window.addEventListener('resize', apply);
-    apply();
-    idleT = setTimeout(autoTour, 5000);
+    apply(); update();
+    tourT = setTimeout(tour, 2500);
+  });
+
+  /* ---------- planner: personal inspection timeline ---------- */
+  var planner = document.getElementById('planner');
+  if (planner) {
+    var dateIn = document.getElementById('pl-date');
+    var roomsIn = document.getElementById('pl-rooms');
+    var stepsEl = planner.querySelector('.js-pl-steps');
+    var daysEl = planner.querySelector('.js-pl-days');
+    var daysLabel = planner.querySelector('.js-pl-days-label');
+    var dateLabel = planner.querySelector('.js-pl-date-label');
+    var waBtn = planner.querySelector('.js-pl-wa');
+    var DAY = 864e5;
+    var fmt = function (d) { try { return new Intl.DateTimeFormat('he-IL', { weekday: 'long', day: 'numeric', month: 'long' }).format(d); } catch (e) { return d.toLocaleDateString(); } };
+    var addDays = function (d, n) { return new Date(d.getTime() + n * DAY); };
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    // default: three weeks from today
+    var def = addDays(today, 21);
+    dateIn.value = def.getFullYear() + '-' + String(def.getMonth() + 1).padStart(2, '0') + '-' + String(def.getDate()).padStart(2, '0');
+    var TYPES = {
+      new: { label: 'תאריך מסירת המפתח', event: 'מסירת המפתח', name: 'בדק בית לדירה חדשה' },
+      used: { label: 'תאריך החתימה על החוזה', event: 'החתימה על החוזה', name: 'בדק בית לדירה יד 2' },
+      after: { label: 'מתי נכנסתם לדירה?', event: 'הכניסה לדירה', name: 'חוות דעת על ליקויים אחרי הכניסה' }
+    };
+    function type() { var c = planner.querySelector('input[name="pl-type"]:checked'); return c ? c.value : 'new'; }
+    function step(when, title, text, state) {
+      var li = document.createElement('li');
+      if (state) li.className = state;
+      var t = document.createElement('time'); t.textContent = when;
+      var b = document.createElement('b'); b.textContent = title;
+      var p = document.createElement('span'); p.textContent = text;
+      li.appendChild(t); li.appendChild(b); li.appendChild(p);
+      return li;
+    }
+    function render() {
+      var tp = type(), T = TYPES[tp];
+      dateLabel.textContent = T.label;
+      while (stepsEl.firstChild) stepsEl.removeChild(stepsEl.firstChild);
+      var d = dateIn.value ? new Date(dateIn.value + 'T00:00:00') : null;
+      if (!d || isNaN(d)) { daysEl.textContent = '—'; daysLabel.textContent = 'בחרו תאריך כדי לראות את לוח הזמנים'; return; }
+      var diff = Math.round((d - today) / DAY);
+      var list = [];
+      if (tp === 'after') {
+        var since = -diff;
+        daysEl.textContent = since >= 0 ? since : 0;
+        daysLabel.textContent = since >= 0 ? 'ימים מאז הכניסה לדירה' : 'התאריך עוד לא הגיע';
+        list.push(step('היום', 'מתעדים ושולחים הודעה', 'צלמו את הליקויים ושלחו לדוד בוואטסאפ. כדאי לא לחכות, כדי לפעול בתוך תקופת הבדק והאחריות.', 'is-now'));
+        list.push(step('בימים הקרובים', 'בדיקה הנדסית בנכס', 'בדיקה עם מכשור מתקדם, כולל מצלמה תרמית ומד לחות.'));
+        list.push(step('ימים ספורים אחרי הבדיקה', 'חוות דעת מומחה', 'חוות דעת מסודרת עם תמונות, תקנים ואומדן עלויות, שאפשר להעביר לקבלן או להגיש לבית משפט.'));
+        list.push(step('אחרי קבלת הדוח', 'דרישה בכתב לקבלן', 'מעבירים לקבלן את הדוח ודורשים תיקון. דוד מלווה אתכם גם בשלב הזה.'));
+      } else {
+        daysEl.textContent = diff >= 0 ? diff : 0;
+        daysLabel.textContent = diff > 0 ? 'ימים עד ' + T.event : (diff === 0 ? T.event + ' היום' : 'התאריך כבר עבר');
+        var inspect = addDays(d, tp === 'new' ? -3 : -7);
+        var urgent = inspect <= today;
+        list.push(step('היום', 'שולחים הודעה ומתאמים', urgent ? 'הזמן קצר. שלחו הודעה עכשיו ונשתדל לתאם בדיקה בהקדם.' : 'מתאמים מועד מראש, כדי שתהיה גמישות.', 'is-now'));
+        list.push(step(urgent ? 'בהקדם האפשרי' : 'עד ' + fmt(inspect), 'בדיקה בנכס', tp === 'new' ? 'מומלץ לבדוק כמה ימים לפני המסירה, כדי להגיע אליה עם רשימת ליקויים מסודרת.' : 'מומלץ לבדוק לפחות שבוע לפני החתימה, כדי שיהיה זמן למשא ומתן.', urgent ? 'is-urgent' : ''));
+        list.push(step(urgent ? 'ימים ספורים אחרי הבדיקה' : 'עד ' + fmt(addDays(inspect, 2)), 'הדוח אצלכם', 'דוח מפורט עם תמונות, הפניה לתקנים ואומדן עלויות תיקון.'));
+        list.push(step(fmt(d), T.event, tp === 'new' ? 'מגיעים למסירה עם הדוח, ודורשים מהקבלן לתקן את הליקויים.' : 'חותמים כשאתם יודעים בדיוק מה קונים, אחרי משא ומתן על סמך עובדות.'));
+      }
+      list.forEach(function (li) { stepsEl.appendChild(li); });
+      var msg = 'שלום דוד, הגעתי מהאתר. אני מעוניין/ת ב' + T.name + '. ' + T.label.replace('?', '') + ': ' + fmt(d) + '.' + (roomsIn.value ? ' מספר חדרים: ' + roomsIn.value + '.' : '');
+      waBtn.href = 'https://wa.me/' + PHONE_WA + '?text=' + encodeURIComponent(msg);
+    }
+    Array.prototype.forEach.call(planner.querySelectorAll('input, select'), function (el) { el.addEventListener('change', render); el.addEventListener('input', render); });
+    render();
   }
+
+  /* ---------- timeline line draws in when visible ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll('.timeline'), function (tl) {
+    if (reduceMotion || !('IntersectionObserver' in window)) return;
+    tl.classList.add('js-draw');
+    var o = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { tl.classList.add('is-drawn'); o.disconnect(); } }, { threshold: 0.2 });
+    o.observe(tl);
+  });
 
   /* ---------- certificates: carousel + lightbox (view only) ---------- */
   var track = $('#certs-track');

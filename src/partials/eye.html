@@ -1,9 +1,9 @@
     <div class="eye__layout">
-      <div>
+      <div class="eye__main">
         <div class="eye__stage" id="eye-stage" role="img" aria-label="הדמיה אינטראקטיבית: סלון מעוצב, ובתוך עדשה תרמית נחשפים ליקויים נסתרים">
-          <img src="assets/img/photos/lens-room.webp" width="1500" height="791" alt="" loading="lazy">
+          <img src="assets/img/photos/lens-room.webp" width="1500" height="791" alt="" decoding="async">
           <div class="eye__thermal" aria-hidden="true">
-            <img src="assets/img/photos/lens-room.webp" width="1500" height="791" alt="" loading="lazy">
+            <img src="assets/img/photos/lens-room.webp" width="1500" height="791" alt="" decoding="async">
             <div class="eye__defects">
               <span class="blob blob--moist"></span>
               <span class="blob blob--window"></span>
@@ -12,13 +12,27 @@
               <svg class="crack" viewBox="0 0 100 200" preserveAspectRatio="none"><path d="M50 0 L46 30 L56 52 L44 80 L52 104 L40 136 L48 160 L36 200 M56 52 L74 66 M44 80 L26 92"/></svg>
             </div>
           </div>
-          <div class="eye__lens" aria-hidden="true"><span class="js-temp">19.4°C</span></div>
-          <p class="eye__hint" aria-hidden="true"><svg><use href="#i-hand"/></svg>גררו את העדשה</p>
+          <span class="eye__pin" data-i="0" aria-hidden="true">1</span>
+          <span class="eye__pin" data-i="1" aria-hidden="true">2</span>
+          <span class="eye__pin" data-i="2" aria-hidden="true">3</span>
+          <span class="eye__pin" data-i="3" aria-hidden="true">4</span>
+          <span class="eye__pin" data-i="4" aria-hidden="true">5</span>
+          <div class="eye__lens" aria-hidden="true"><span class="js-temp">21.4°C</span></div>
+          <div class="eye__callout" aria-hidden="true" hidden><b class="js-callout-title"></b><span class="js-callout-temp"></span></div>
+          <p class="eye__hint" aria-hidden="true"><svg><use href="#i-hand"/></svg><span class="eye__hint-desk">הזיזו את העכבר על החדר</span><span class="eye__hint-touch">הקישו על החדר כדי להזיז את העדשה</span></p>
         </div>
-        <div class="eye__foot"><span>הדמיה להמחשה. בבדיקה אמיתית כל ממצא מתועד בתמונה ובמדידה.</span><a class="btn btn--gold btn--sm js-wa" data-wa="בדיקה עם מצלמה תרמית" href="https://wa.me/972509737244" target="_blank" rel="noopener noreferrer">אני רוצה בדיקה כזו</a></div>
+        <div class="eye__bar">
+          <div class="eye__progress" aria-live="polite"><b><span class="js-found">0</span>/5</b> ליקויים נמצאו<span class="eye__meter"><span class="js-meter"></span></span></div>
+          <button class="eye__mode js-eye-mode" type="button" aria-pressed="false">מצב תרמי מלא</button>
+        </div>
+        <div class="eye__done" hidden>
+          <p><b>מצאתם את כל חמשת הליקויים.</b> בבדיקה אמיתית אנחנו מוצאים גם את מה שהעין לא רואה, ומתעדים כל ממצא בתמונה ובמדידה.</p>
+          <a class="btn btn--light btn--sm js-wa" data-wa="בדיקה עם מצלמה תרמית" href="https://wa.me/972509737244" target="_blank" rel="noopener noreferrer">אני רוצה בדיקה כזו</a>
+        </div>
+        <p class="eye__note">הדמיה להמחשה. בבדיקה אמיתית כל ממצא מתועד בתמונה ובמדידה.</p>
       </div>
       <div class="eye__panel" role="group" aria-label="ממצאים נסתרים">
-        <button class="eye__item" type="button" data-x="21" data-y="23" data-t="14.2" aria-pressed="true"><span class="n">1</span><div><b>רטיבות נסתרת בקיר</b><span>כתם קר שעוד לא נראה בצבע. מעיד על חדירת מים מהגג, מהצנרת או מהמרפסת שמעל.</span></div></button>
+        <button class="eye__item" type="button" data-x="21" data-y="23" data-t="14.2" aria-pressed="false"><span class="n">1</span><div><b>רטיבות נסתרת בקיר</b><span>כתם קר שעוד לא נראה בצבע. מעיד על חדירת מים מהגג, מהצנרת או מהמרפסת שמעל.</span></div></button>
         <button class="eye__item" type="button" data-x="47" data-y="21" data-t="21.0" aria-pressed="false"><span class="n">2</span><div><b>סדק בטיח</b><span>סדק נימי יכול להיות קוסמטי, ויכול להעיד על תזוזה במבנה. הבדיקה מבחינה בין השניים ומתעדת אותו.</span></div></button>
         <button class="eye__item" type="button" data-x="84" data-y="41" data-t="12.8" aria-pressed="false"><span class="n">3</span><div><b>איטום חסר סביב חלון</b><span>מרווח לא אטום בין המסגרת לקיר מכניס מים ורוח. מאותר בבדיקת הצפה ובמצלמה תרמית.</span></div></button>
         <button class="eye__item" type="button" data-x="60" data-y="91" data-t="24.6" aria-pressed="false"><span class="n">4</span><div><b>אריחים חלולים</b><span>אריח שנשמע חלול בהקשה עלול להיסדק או להתנתק. בודקים גם מישוריות ושיפועים.</span></div></button>

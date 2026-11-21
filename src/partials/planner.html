@@ -1,0 +1,26 @@
+<section class="section planner-sec" id="planner" aria-labelledby="planner-title">
+  <div class="wrap planner">
+    <div class="planner__intro reveal">
+      <div class="heading"><h2 id="planner-title">מתי להזמין בדק בית?</h2><p>בחרו את סוג הנכס ואת התאריך הקובע, ותקבלו לוח זמנים אישי: מתי לפנות, מתי לבדוק ומתי הדוח אצלכם.</p></div>
+      <div class="planner__form">
+        <fieldset class="planner__types">
+          <legend>סוג הבדיקה</legend>
+          <label><input type="radio" name="pl-type" id="pl-new" value="new" checked><span>דירה חדשה מקבלן</span></label>
+          <label><input type="radio" name="pl-type" id="pl-used" value="used"><span>דירה יד 2</span></label>
+          <label><input type="radio" name="pl-type" id="pl-after" value="after"><span>ליקויים אחרי הכניסה</span></label>
+        </fieldset>
+        <div class="planner__row">
+          <label class="planner__field" for="pl-date"><span class="js-pl-date-label">תאריך מסירת המפתח</span><input type="date" id="pl-date"></label>
+          <label class="planner__field" for="pl-rooms"><span>מספר חדרים</span>
+            <select id="pl-rooms"><option value="">לא חובה</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6+</option><option>בית פרטי</option></select>
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="planner__out reveal" aria-live="polite">
+      <p class="planner__count"><b class="js-pl-days">—</b><span class="js-pl-days-label">בחרו תאריך כדי לראות את לוח הזמנים</span></p>
+      <ol class="planner__steps js-pl-steps"></ol>
+      <a class="btn btn--wa js-pl-wa" href="https://wa.me/972509737244" target="_blank" rel="noopener noreferrer"><svg aria-hidden="true"><use href="#i-wa"/></svg>שליחת הפרטים לדוד בוואטסאפ</a>
+    </div>
+  </div>
+</section>

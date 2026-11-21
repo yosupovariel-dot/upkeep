@@ -98,8 +98,7 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 const arrow = '<svg aria-hidden="true"><use href="#i-arrow"/></svg>';
 const serviceCards = SERVICES.map((s) => `      <a class="svc reveal" href="${s.page}">
         <div class="svc__img"><img src="assets/img/photos/${s.img}.webp" width="900" height="600" alt="${esc(s.alt)}" loading="lazy"></div>
-        <h3>${esc(s.title)}</h3>
-        <p>${esc(s.short)}</p>
+        <div class="svc__cap"><h3>${esc(s.title)}</h3><p>${esc(s.short)}</p><span class="svc__go">לפרטים${arrow}</span></div>
       </a>`).join('\n');
 const serviceIndex = SERVICES.map((s) => `      <a href="#${s.id}">${esc(s.title)}</a>`).join('\n');
 const serviceDetails = SERVICES.map((s) => `    <article class="svc-detail reveal" id="${s.id}">
@@ -171,8 +170,7 @@ function servicePage(s) {
     <div class="svc-grid">
 ${rel.map((o) => `      <a class="svc reveal" href="${o.page}">
         <div class="svc__img"><img src="assets/img/photos/${o.img}.webp" width="900" height="600" alt="${esc(o.alt)}" loading="lazy"></div>
-        <h3>${esc(o.title)}</h3>
-        <p>${esc(o.short)}</p>
+        <div class="svc__cap"><h3>${esc(o.title)}</h3><p>${esc(o.short)}</p><span class="svc__go">לפרטים${arrow}</span></div>
       </a>`).join('\n')}
     </div>
   </div>
@@ -307,7 +305,7 @@ ${fbPosts.slice(0, 3).map((x) => `      <article class="fb-post reveal">
 const fbTop = fb ? `      <a href="${esc(fb)}" target="_blank" rel="noopener noreferrer"><svg aria-hidden="true"><use href="#i-fb"/></svg>פייסבוק</a>` : '';
 const fbFooter = fb ? `          <li><a href="${esc(fb)}" target="_blank" rel="noopener noreferrer"><svg aria-hidden="true"><use href="#i-fb"/></svg>עמוד הפייסבוק</a></li>` : '';
 const P = {};
-for (const n of ['header', 'footer', 'sprite', 'eye', 'cta']) P[n] = await readFile(`${SRC}/partials/${n}.html`, 'utf8');
+for (const n of ['header', 'footer', 'sprite', 'eye', 'cta', 'planner']) P[n] = await readFile(`${SRC}/partials/${n}.html`, 'utf8');
 
 const pages = [];
 for (const f of (await readdir(`${SRC}/pages`)).filter((f) => f.endsWith('.html'))) pages.push([f, await readFile(`${SRC}/pages/${f}`, 'utf8')]);
@@ -317,7 +315,7 @@ for (const [file, raw] of pages) {
   if (!m) throw new Error(`missing page meta in ${file}`);
   const meta = JSON.parse(m[1]);
   let body = raw.slice(m[0].length);
-  const vars = { eye: P.eye, cta: P.cta, serviceCards, serviceIndex, serviceDetails, quals, certsAll, certsTeaser, reviews: reviewsHtml, facebook: facebookHtml };
+  const vars = { eye: P.eye, cta: P.cta, planner: P.planner, serviceCards, serviceIndex, serviceDetails, quals, certsAll, certsTeaser, reviews: reviewsHtml, facebook: facebookHtml };
   body = body.replace(/\{\{(\w+)\}\}/g, (_, k) => { if (!(k in vars)) throw new Error(`unknown var ${k} in ${file}`); return vars[k]; });
   const header = P.header.replace('{{sprite}}', P.sprite).replace('{{navItems}}', navItems(meta.nav)).replace('{{menuItems}}', menuItems(meta.nav)).replace('{{fbTop}}', fbTop);
   const footer = P.footer.replace('{{footerNav}}', footerNav).replace('{{fbFooter}}', fbFooter);
