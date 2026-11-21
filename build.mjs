@@ -38,7 +38,7 @@ const SERVICES = [
   { id: 'expert-opinion', title: 'חוות דעת הנדסית ומשפטית', img: 'svc-legal', alt: 'חתימה על מסמך',
     short: 'חוות דעת קבילה בבית משפט, כולל אומדן עלויות תיקון והפניה לתקנים.',
     long: 'כשיש מחלוקת על ליקויים, צריך חוות דעת מומחה שתעמוד בבית המשפט. חוות הדעת נכתבת לפי הדרישות, עם ממצאים מתועדים, הפניה לתקנים ואומדן עלויות.',
-    items: ['חוות דעת לפי דרישות בית המשפט', 'תיעוד ממצאים בתמונות ובמדידות', 'הפניה לתקנים ולמפרט', 'אומדן עלויות תיקון', 'עדות בבית המשפט במידת הצורך'] },
+    items: ['חוות דעת לפי דרישות בית המשפט', 'תיעוד ממצאים בתמונות ובמדידות', 'הפניה לתקנים ולמפרט', 'אומדן עלויות תיקון', 'חוות דעת לנזקי הדף מלחימה מול מס רכוש', 'עדות בבית המשפט במידת הצורך'] },
   { id: 'court-expert', title: 'מומחה מטעם בית המשפט', img: 'svc-court', alt: 'ספרייה משפטית',
     short: 'חוות דעת מומחה בסכסוכים בין יזמים, קבלנים ודיירים, וליווי עורכי דין.',
     long: 'דוד משמש מומחה מטעם בתי המשפט בסכסוכי בנייה. הבדיקה נעשית באופן מקצועי ואובייקטיבי, ומשמשת את בית המשפט ואת הצדדים בהכרעה.',
@@ -278,17 +278,26 @@ ${realReviews.slice(0, 6).map((r) => `      <figure class="quote reveal"><div cl
   </div>
 </section>`;
 const fb = CFG.facebookUrl;
+const fbPosts = (CFG.facebookPosts || []).filter((x) => x && x.text);
+const fbPara = (t) => t.split('\n').map((l) => l.startsWith('✔') ? `<li>${esc(l.replace(/^✔\s*/, ''))}</li>` : `<p>${esc(l)}</p>`).join('').replace(/(<li>.*?<\/li>)+/g, (m) => `<ul>${m}</ul>`);
 const facebookHtml = fb ? `<section class="section fb-lux" aria-labelledby="fb-title">
-  <div class="wrap fb-wrap">
-    <div class="split__copy reveal">
-      <div class="heading"><h2 id="fb-title">מהשטח, בפייסבוק</h2><p>בדיקות, ממצאים וטיפים מקצועיים שאנחנו משתפים בעמוד הפייסבוק.</p></div>
-      <div class="btn-row"><a class="btn btn--fb" href="${esc(fb)}" target="_blank" rel="noopener noreferrer"><svg aria-hidden="true"><use href="#i-fb"/></svg>לעמוד הפייסבוק</a></div>
+  <div class="wrap">
+    <div class="fb-head reveal">
+      <div class="heading"><h2 id="fb-title">מהשטח, בפייסבוק</h2><p>עדכונים, טיפים מקצועיים ובדיקות מהשטח מעמוד הפייסבוק של א.ח.ד.</p></div>
+      <a class="btn btn--fb" href="${esc(fb)}" target="_blank" rel="noopener noreferrer"><svg aria-hidden="true"><use href="#i-fb"/></svg>לעמוד הפייסבוק</a>
     </div>
-    <div class="fb-embed reveal" data-page="${esc(fb)}">
+${fbPosts.length ? `    <div class="fb-posts">
+${fbPosts.slice(0, 3).map((x) => `      <article class="fb-post reveal">
+        <header class="fb-post__head"><img src="assets/img/logo-emblem-dark-sm.webp" width="158" height="180" alt=""><div><b>א.ח.ד - הנדסה ובטיחות</b><span>${esc(x.date)}${x.topic ? ` · ${esc(x.topic)}` : ''}</span></div><svg class="fb-post__brand" aria-hidden="true"><use href="#i-fb"/></svg></header>
+        <div class="fb-post__body">${fbPara(x.text)}</div>
+        <a class="fb-post__more" href="${esc(fb)}" target="_blank" rel="noopener noreferrer">לפוסט המלא בפייסבוק${arrow}</a>
+      </article>`).join('\n')}
+    </div>` : ''}
+    <div class="fb-embed fb-embed--feed reveal" data-page="${esc(fb)}">
       <div class="fb-embed__frame">
         <div class="fb-embed__placeholder">
           <svg aria-hidden="true"><use href="#i-fb"/></svg>
-          <button class="btn btn--fb js-fb-load" type="button">הצגת הפוסטים האחרונים</button>
+          <button class="btn btn--fb js-fb-load" type="button">הצגת הפיד העדכני מפייסבוק</button>
           <small>לחיצה תטען תוכן מפייסבוק (Meta), בהתאם ל<a href="privacy.html">מדיניות הפרטיות</a>.</small>
         </div>
       </div>
