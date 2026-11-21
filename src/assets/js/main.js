@@ -46,6 +46,16 @@
     try { if (window.localStorage.getItem('ahd-fb') === '1') btn.click(); } catch (e) { /* ignore */ }
   });
 
+  /* equipment monitor: running recording timer */
+  Array.prototype.forEach.call(document.querySelectorAll('.js-gear-time'), function (el) {
+    var t0 = Date.now();
+    setInterval(function () {
+      if (doc.classList.contains('a11y-still')) return;
+      var s = Math.floor((Date.now() - t0) / 1000) % 3600;
+      el.textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+    }, 1000);
+  });
+
   /* ---------- small live details ---------- */
   var y = new Date().getFullYear();
   $$('.js-year').forEach(function (el) { el.textContent = y; });
