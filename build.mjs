@@ -15,10 +15,8 @@ const SITE = 'https://one-handasa.com/';
 const NAV = [
   ['home', 'index.html', 'בית'],
   ['about', 'about.html', 'אודות'],
-  ['why', 'about.html#why', 'למה לבחור בנו'],
   ['services', 'services.html', 'תחומי התמחות'],
   ['inspection', 'home-inspection.html', 'בדק בית'],
-  ['certs', 'certificates.html', 'הסמכות'],
   ['clients', 'testimonials.html', 'לקוחות מרוצים'],
   ['contact', 'contact.html', 'צור קשר']
 ];
@@ -101,6 +99,8 @@ const serviceCards = SERVICES.map((s) => `      <a class="svc reveal" href="${s.
         <div class="svc__img"><img src="assets/img/photos/${s.img}.webp" width="900" height="600" alt="${esc(s.alt)}" loading="lazy"></div>
         <div class="svc__cap"><h3>${esc(s.title)}</h3><p>${esc(s.short)}</p><span class="svc__go">לפרטים${arrow}</span></div>
       </a>`).join('\n');
+const HOME_SERVICES = ['new-apartment', 'second-hand', 'expert-opinion', 'court-expert', 'supervision', 'structure'];
+const serviceCardsHome = serviceCards.split('\n      <a class="svc').map((c, i) => (i ? '      <a class="svc' + c : c)).filter((c) => HOME_SERVICES.some((id) => c.includes(`service-${id}.html`))).join('\n');
 const serviceIndex = SERVICES.map((s) => `      <a href="#${s.id}">${esc(s.title)}</a>`).join('\n');
 const serviceDetails = SERVICES.map((s) => `    <article class="svc-detail reveal" id="${s.id}">
       <div class="svc-detail__media"><img src="assets/img/photos/${s.img}.webp" width="900" height="600" alt="${esc(s.alt)}" loading="lazy"></div>
@@ -187,7 +187,7 @@ const certsTeaser = CERTS.slice(0, 4).map(certItem).join('\n');
 
 const navItems = (active) => NAV.map(([k, href, label]) => `        <li><a href="${href}"${k === active ? ' aria-current="page"' : ''}>${label}</a></li>`).join('\n');
 const menuItems = (active) => NAV.map(([k, href, label]) => `    <li><a href="${href}"${k === active ? ' aria-current="page"' : ''}>${label}${arrow}</a></li>`).join('\n');
-const footerNav = NAV.filter(([k]) => k !== 'home').map(([, href, label]) => `          <li><a href="${href}">${label}</a></li>`).join('\n');
+const footerNav = [...NAV.filter(([k]) => k !== 'home'), ['certs', 'certificates.html', 'הסמכות ותעודות']].map(([, href, label]) => `          <li><a href="${href}">${label}</a></li>`).join('\n');
 
 const LD = JSON.stringify({ '@context': 'https://schema.org', '@type': 'HomeAndConstructionBusiness', name: 'א.ח.ד הנדסת בניין ובטיחות', alternateName: 'א.ח.ד הנדסה ובטיחות', description: 'בדק בית, איתור ליקויי בנייה, חוות דעת הנדסית ומשפטית, מומחה מטעם בתי משפט, אישורי קונסטרוקציה ושירותי בטיחות.', telephone: '+972-50-973-7244', url: SITE, image: SITE + 'assets/img/og-image.jpg', founder: { '@type': 'Person', name: "דוד חי אברג'ל" }, address: { '@type': 'PostalAddress', addressLocality: 'שדרות', addressCountry: 'IL' }, areaServed: 'IL' });
 
@@ -343,7 +343,7 @@ for (const [file, raw] of pages) {
   if (!m) throw new Error(`missing page meta in ${file}`);
   const meta = JSON.parse(m[1]);
   let body = raw.slice(m[0].length);
-  const vars = { eye: P.eye, cta: P.cta, planner: P.planner, serviceCards, serviceIndex, serviceDetails, quals, certsAll, certsTeaser, reviews: reviewsHtml, facebook: facebookHtml, clientsSummary, clientsWall, midragHref: esc(midragHref) };
+  const vars = { serviceCardsHome, eye: P.eye, cta: P.cta, planner: P.planner, serviceCards, serviceIndex, serviceDetails, quals, certsAll, certsTeaser, reviews: reviewsHtml, facebook: facebookHtml, clientsSummary, clientsWall, midragHref: esc(midragHref) };
   body = body.replace(/\{\{(\w+)\}\}/g, (_, k) => { if (!(k in vars)) throw new Error(`unknown var ${k} in ${file}`); return vars[k]; });
   const header = P.header.replace('{{sprite}}', P.sprite).replace('{{navItems}}', navItems(meta.nav)).replace('{{menuItems}}', menuItems(meta.nav)).replace('{{fbTop}}', fbTop);
   const footer = P.footer.replace('{{footerNav}}', footerNav).replace('{{fbFooter}}', fbFooter);
